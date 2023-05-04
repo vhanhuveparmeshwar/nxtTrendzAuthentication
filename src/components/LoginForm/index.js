@@ -6,13 +6,26 @@ class LoginForm extends Component {
   state = {
     username: '',
     password: '',
-    isInvalidUser: false,
+    showSubmitError: false,
+    errorMsg: '',
+  }
+
+  onChangeUsername = event => {
+    this.setState({username: event.target.value})
+  }
+
+  onChangePassword = event => {
+    this.setState({password: event.target.value})
   }
 
   onSubmitSuccess = () => {
     const {history} = this.props
-    console.log(this.props)
+
     history.replace('/')
+  }
+
+  onSubmitFailure = errorMsg => {
+    this.setState({showSubmitError: true, errorMsg})
   }
 
   submitForm = async event => {
@@ -26,24 +39,16 @@ class LoginForm extends Component {
     }
     const response = await fetch(url, options)
     const data = await response.json()
-    console.log(data)
     if (response.ok === true) {
       this.onSubmitSuccess()
     } else {
-      this.setState({isInvalidUser: true})
+      this.onSubmitFailure(data.error_msg)
     }
-  }
-
-  onChangeUsername = event => {
-    this.setState({username: event.target.value})
-  }
-
-  onChangePassword = event => {
-    this.setState({password: event.target.value})
   }
 
   renderPasswordField = () => {
     const {password} = this.state
+
     return (
       <>
         <label className="input-label" htmlFor="password">
@@ -52,10 +57,10 @@ class LoginForm extends Component {
         <input
           type="password"
           id="password"
-          placeholder="Password"
-          className="password-input-filed"
+          className="password-input-field"
           value={password}
           onChange={this.onChangePassword}
+          placeholder="Password"
         />
       </>
     )
@@ -63,6 +68,7 @@ class LoginForm extends Component {
 
   renderUsernameField = () => {
     const {username} = this.state
+
     return (
       <>
         <label className="input-label" htmlFor="username">
@@ -71,34 +77,33 @@ class LoginForm extends Component {
         <input
           type="text"
           id="username"
-          placeholder="Username"
-          className="username-input-filed"
+          className="username-input-field"
           value={username}
           onChange={this.onChangeUsername}
+          placeholder="Username"
         />
       </>
     )
   }
 
   render() {
-    const {isInvalidUser} = this.state
-
+    const {showSubmitError, errorMsg} = this.state
     return (
       <div className="login-form-container">
         <img
           src="https://assets.ccbp.in/frontend/react-js/nxt-trendz-logo-img.png"
-          className="login-website-logo-mobile-image"
+          className="login-website-logo-mobile-img"
           alt="website logo"
         />
         <img
           src="https://assets.ccbp.in/frontend/react-js/nxt-trendz-login-img.png"
-          className="login-image"
+          className="login-img"
           alt="website login"
         />
         <form className="form-container" onSubmit={this.submitForm}>
           <img
             src="https://assets.ccbp.in/frontend/react-js/nxt-trendz-logo-img.png"
-            className="login-website-logo-desktop-image"
+            className="login-website-logo-desktop-img"
             alt="website logo"
           />
           <div className="input-container">{this.renderUsernameField()}</div>
@@ -106,9 +111,7 @@ class LoginForm extends Component {
           <button type="submit" className="login-button">
             Login
           </button>
-          {isInvalidUser && (
-            <p className="error-message">*Username and Password didn't match</p>
-          )}
+          {showSubmitError && <p className="error-message">*{errorMsg}</p>}
         </form>
       </div>
     )
